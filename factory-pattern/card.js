@@ -135,8 +135,6 @@ function renderRecipes(recipeList) {
   });
 
   if (countLabel) {
-    const total = recipeList.length;
-    countLabel.textContent =
-      total <= 1 ? "1 recette trouvée" : `${total} recettes trouvées`;
+    updateRecipesResultLabel(countLabel, recipeList.length);
   }
 }
