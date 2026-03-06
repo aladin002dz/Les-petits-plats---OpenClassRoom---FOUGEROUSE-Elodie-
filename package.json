@@ -4,12 +4,13 @@
   "description": "Algorithme de recherche de recettes en JavaScript",
   "main": "recipes.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx @tailwindcss/cli -i ./src/main.css -o ./style.css --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
+    "@tailwindcss/cli": "^4.2.1",
     "tailwindcss": "^4.2.1"
   }
 }
