@@ -1,3 +1,6 @@
+import recipes from "./data.js";
+import renderRecipes from "./templates/card.js";
+
 /**
  * Point d'entrée : affiche les recettes via factory-pattern/card.js
  */

@@ -22,3 +22,5 @@ function updateRecipesResultLabel(total) {
 
   //Object.assign(element.style, RESULT_LABEL_STYLES);
 }
+
+export default updateRecipesResultLabel;
