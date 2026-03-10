@@ -1,3 +1,5 @@
+import updateRecipesResultLabel from "./templates/resultats.js";
+
 // Chemin des images de recettes (relatif à index.html).
 const IMAGE_BASE_PATH = "./assets/images/recettes/";
 
@@ -120,7 +122,7 @@ function recipeFactory(data) {
  */
 function renderRecipes(recipeList) {
   const grid = document.getElementById("recipes-grid");
-  const countLabel = document.getElementById("recipes-count");
+
 
   if (!grid) {
     return;
@@ -134,7 +136,8 @@ function renderRecipes(recipeList) {
     grid.appendChild(card);
   });
 
-  if (countLabel) {
-    updateRecipesResultLabel(countLabel, recipeList.length);
-  }
+  updateRecipesResultLabel(recipeList.length);
 }
+
+
+export default renderRecipes;

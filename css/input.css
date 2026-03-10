@@ -4,11 +4,20 @@
 @source "../*.html";
 @source "../**/*.js";
 
-/* Variables de couleur */
+/* Variables de design */
 @theme {
+  /* Couleurs */
   --color-primary: #ffd15b;
   --color-white: #ffffff;
   --color-dark: #1b1b1b;
   --color-gray: #7a7a7a;
   --color-light-gray: #ededed;
+
+  /* Typographie */
+  --font-Anton: 'Anton', sans-serif;
+  --font-Manrope: 'Manrope', sans-serif;
+
+  /* Tailles de police */
+  --text-heading: 44px;
+  --text-result: 21px;
 }

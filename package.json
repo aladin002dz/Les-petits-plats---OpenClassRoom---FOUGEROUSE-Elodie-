@@ -4,8 +4,8 @@
   "description": "Algorithme de recherche de recettes en JavaScript",
   "main": "recipes.js",
   "scripts": {
-    "build": "npx @tailwindcss/cli -i ./src/main.css -o ./style.css",
-    "dev": "npx @tailwindcss/cli -i ./src/main.css -o ./style.css --watch"
+    "build": "npx @tailwindcss/cli -i ./css/input.css -o ./css/style.css",
+    "dev": "npx @tailwindcss/cli -i ./css/input.css -o ./css/style.css --watch"
   },
   "keywords": [],
   "author": "",
