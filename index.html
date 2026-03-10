@@ -1,72 +1,58 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Les petits plats – Recettes</title>
 
-    <!-- Police Manrope -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400&display=swap"
-      rel="stylesheet"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Les petits plats – Recettes</title>
 
-    <!-- Tailwind CSS -->
-    <link href="./style.css" rel="stylesheet">
-  </head>
-  <body class="min-h-dvh bg-light-gray text-slate-900">
-    <header
-      class="relative flex min-h-[667px] flex-col bg-slate-900 bg-cover bg-center bg-no-repeat"
-      style="background-image: url('./assets/images/Header_Les-petits-plats.png');"
-    >
-      <div class="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pt-6">
-        <div class="flex items-center gap-2">
-          <img
-            src="./assets/images/Logo.svg"
-            alt="Les petits plats"
-            class="min-h-[25.26px] h-[] w-auto brightness-0 invert"
-          />
-        </div>
-        <p
-          class="mx-auto mt-auto flex max-w-2xl flex-1 flex-col items-center justify-center pb-12 text-primary"
-          style="font-family: 'Anton', sans-serif; font-weight: 400; font-size: 44px; line-height: 100%; letter-spacing: 0; text-align: center;"
-        >
-          <span>Cherchez parmi plus de 1500 recettes</span>
-          <span>du quotidien, simples et délicieuses</span>
-        </p>
+  <!-- Police Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <link href="./css/style.css" rel="stylesheet">
+</head>
+
+<body class="min-h-dvh bg-light-gray text-slate-900">
+  <header class="relative flex min-h-[667px] flex-col bg-slate-900 bg-cover bg-center bg-no-repeat"
+    style="background-image: url('./assets/images/Header_Les-petits-plats.png');">
+    <div class="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pt-6">
+      <div class="flex items-center gap-2">
+        <img src="./assets/images/Logo.svg" alt="Les petits plats"
+          class="min-h-[25.26px] h-[] w-auto brightness-0 invert" />
       </div>
-    </header>
+      <p
+        class="mx-auto mt-auto flex max-w-2xl flex-1 flex-col items-center justify-center pb-12 text-center font-Anton text-heading font-normal leading-none tracking-normal text-primary">
+        <span>Cherchez parmi plus de 1500 recettes</span>
+        <span>du quotidien, simples et délicieuses</span>
+      </p>
+    </div>
+  </header>
 
-    <main class="mx-auto max-w-6xl px-4 py-8">
-      <section aria-labelledby="recipes-title">
-        <header class="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 id="recipes-title" class="hidden">
-              Recettes Les petits plats
-            </h1>
-          </div>
-          <p
-            id="recipes-count"
-            class="text-sm font-medium text-slate-600"
-            aria-live="polite"
-          ></p>
-        </header>
-
-        <div
-          id="recipes-grid"
-          class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          aria-live="polite"
-        >
-          <!-- Les cards sont injectées par factory-pattern/card.js -->
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    <section aria-labelledby="recipes-title">
+      <header class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 id="recipes-title" class="hidden">
+            Recettes Les petits plats
+          </h1>
         </div>
-      </section>
-    </main>
+        <p id="recipes-count" class="font-Anton text-result font-normal leading-none tracking-normal text-dark"
+          aria-live="polite"></p>
+      </header>
 
-    <script src="./recipes.js"></script>
-    <script src="./factory-pattern/resultats.js"></script>
-    <script src="./factory-pattern/card.js"></script>
-    <script src="./main.js"></script>
-  </body>
+      <div id="recipes-grid" class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
+        <!-- Les cards sont injectées par factory-pattern/card.js -->
+      </div>
+    </section>
+  </main>
+
+  <script src="./js/data.js"></script>
+  <script src="./js/templates/resultats.js"></script>
+  <script src="./js/templates/card.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+
 </html>

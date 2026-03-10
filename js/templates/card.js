@@ -120,7 +120,7 @@ function recipeFactory(data) {
  */
 function renderRecipes(recipeList) {
   const grid = document.getElementById("recipes-grid");
-  const countLabel = document.getElementById("recipes-count");
+
 
   if (!grid) {
     return;
@@ -134,7 +134,5 @@ function renderRecipes(recipeList) {
     grid.appendChild(card);
   });
 
-  if (countLabel) {
-    updateRecipesResultLabel(countLabel, recipeList.length);
-  }
+  updateRecipesResultLabel(recipeList.length);
 }

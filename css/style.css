@@ -7,14 +7,8 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-    --color-amber-300: oklch(87.9% 0.169 91.605);
-    --color-slate-50: oklch(98.4% 0.003 247.858);
-    --color-slate-100: oklch(96.8% 0.007 247.896);
-    --color-slate-200: oklch(92.9% 0.013 255.508);
     --color-slate-600: oklch(44.6% 0.043 257.281);
     --color-slate-900: oklch(20.8% 0.042 265.755);
-    --color-gray-700: oklch(37.3% 0.034 259.733);
-    --color-black: #000;
     --color-white: #ffffff;
     --spacing: 0.25rem;
     --container-2xl: 42rem;
@@ -37,6 +31,8 @@
     --color-dark: #1b1b1b;
     --color-gray: #7a7a7a;
     --color-light-gray: #ededed;
+    --font-Anton: 'Anton', sans-serif;
+    --text-heading: 44px;
   }
 }
 @layer base {
@@ -380,6 +376,12 @@
   .pb-12 {
     padding-bottom: calc(var(--spacing) * 12);
   }
+  .text-center {
+    text-align: center;
+  }
+  .font-Anton {
+    font-family: var(--font-Anton);
+  }
   .font-\[Anton\] {
     font-family: Anton;
   }
@@ -400,6 +402,9 @@
   .text-xs {
     font-size: var(--text-xs);
     line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  .text-heading {
+    font-size: var(--text-heading);
   }
   .leading-none {
     --tw-leading: 1;
@@ -464,6 +469,9 @@
   }
   .invert {
     --tw-invert: invert(100%);
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
   .sm\:grid-cols-2 {
