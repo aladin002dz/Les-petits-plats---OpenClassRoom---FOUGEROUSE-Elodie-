@@ -9,16 +9,18 @@
   <!-- Police Manrope -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500&display=swap" rel="stylesheet" />
 
   <!-- Tailwind CSS -->
   <link href="./css/style.css" rel="stylesheet">
 </head>
 
 <body class="min-h-dvh bg-light-gray text-slate-900">
+  <!-- hero -->
   <header class="relative flex min-h-[667px] flex-col bg-slate-900 bg-cover bg-center bg-no-repeat"
     style="background-image: url('./assets/images/Header_Les-petits-plats.png');">
     <div class="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pt-6">
+      <!-- logo -->
       <div class="flex items-center gap-2">
         <img src="./assets/images/Logo.svg" alt="Les petits plats"
           class="min-h-[25.26px] h-[] w-auto brightness-0 invert" />
@@ -32,19 +34,45 @@
   </header>
 
   <main class="mx-auto max-w-6xl px-4 py-8">
+    <!-- section recettes -->
     <section aria-labelledby="recipes-title">
-      <header class="flex flex-wrap items-end justify-between gap-4">
-        <div>
+      <!-- header (filtres + résultat) -->
+      <header class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div class="flex flex-col items-start gap-3 shrink-0">
           <h1 id="recipes-title" class="hidden">
             Recettes Les petits plats
           </h1>
+          <!-- filtres -->
+          <div class="flex flex-wrap items-center gap-[63px]" role="group" aria-label="Filtres de recherche">
+            <button type="button" class="recipes-filter-btn inline-flex h-14 w-[195px] items-center justify-between rounded-[11px] border-none bg-white px-4 py-[17px] font-[Manrope] text-base font-medium leading-none text-dark transition-colors hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer" data-filter="ingredients" aria-expanded="false" aria-haspopup="listbox" aria-label="Filtrer par ingrédient">
+              <span class="flex-1 text-left">Ingrédients</span>
+              <svg class="ml-2 shrink-0 text-dark" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button type="button" class="recipes-filter-btn inline-flex h-14 w-[195px] items-center justify-between rounded-[11px] border-none bg-white px-4 py-[17px] font-[Manrope] text-base font-medium leading-none text-dark transition-colors hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer" data-filter="appliances" aria-expanded="false" aria-haspopup="listbox" aria-label="Filtrer par appareil">
+              <span class="flex-1 text-left">Appareils</span>
+              <svg class="ml-2 shrink-0 text-dark" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button type="button" class="recipes-filter-btn inline-flex h-14 w-[195px] items-center justify-between rounded-[11px] border-none bg-white px-4 py-[17px] font-[Manrope] text-base font-medium leading-none text-dark transition-colors hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer" data-filter="ustensils" aria-expanded="false" aria-haspopup="listbox" aria-label="Filtrer par ustensile">
+              <span class="flex-1 text-left">Ustensiles</span>
+              <svg class="ml-2 shrink-0 text-dark" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <!-- tags -->
+          <div id="recipes-selected-list" class="flex flex-wrap items-center gap-[60px]" aria-live="polite"></div>
         </div>
-        <p id="recipes-count" class="font-Anton text-result font-normal leading-none tracking-normal text-dark"
+        <!-- résultat -->
+        <p id="recipes-count" class="font-Anton text-result font-normal leading-none tracking-normal text-dark shrink-0"
           aria-live="polite"></p>
       </header>
 
-      <div id="recipes-grid" class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
-        <!-- Les cards sont injectées par factory-pattern/card.js -->
+      <!-- grille de recettes -->
+      <div id="recipes-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
       </div>
     </section>
   </main>
