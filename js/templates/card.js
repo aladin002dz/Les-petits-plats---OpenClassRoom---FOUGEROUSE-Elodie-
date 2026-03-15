@@ -1,4 +1,4 @@
-import updateRecipesResultLabel from "./templates/resultats.js";
+import updateRecipesResultLabel from "./resultats.js";
 
 // Chemin des images de recettes (relatif à index.html).
 const IMAGE_BASE_PATH = "./assets/images/recettes/";
