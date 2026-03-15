@@ -33,6 +33,7 @@
     --color-light-gray: #ededed;
     --font-Anton: 'Anton', sans-serif;
     --text-heading: 44px;
+    --text-result: 21px;
   }
 }
 @layer base {
@@ -406,6 +407,9 @@
   .text-heading {
     font-size: var(--text-heading);
   }
+  .text-result {
+    font-size: var(--text-result);
+  }
   .leading-none {
     --tw-leading: 1;
     line-height: 1;
@@ -442,9 +446,6 @@
   }
   .text-primary {
     color: var(--color-primary);
-  }
-  .text-slate-600 {
-    color: var(--color-slate-600);
   }
   .text-slate-900 {
     color: var(--color-slate-900);
