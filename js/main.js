@@ -1,15 +1,15 @@
-import recipes from "./data.js";
 import renderRecipes from "./templates/card.js";
 
 /**
- * Point d'entrée : affiche les recettes via factory-pattern/card.js
+ * Charge les recettes du JSON puis les affiche
  */
-/*document.addEventListener("DOMContentLoaded", () => {
-  if (typeof recipes === "undefined" || !Array.isArray(recipes)) {
-    return;
-  }
-  if (typeof renderRecipes === "function") {*/
-renderRecipes(recipes);
-/*}
-});
-*/
+async function init() {
+  const url = new URL("./recipes.json", import.meta.url).href;
+  const res = await fetch(url);
+  if (!res.ok) return;
+  const recipes = await res.json();
+  if (!Array.isArray(recipes)) return;
+  renderRecipes(recipes);
+}
+
+init();
