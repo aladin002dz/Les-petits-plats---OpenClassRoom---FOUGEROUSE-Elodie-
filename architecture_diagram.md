@@ -153,6 +153,29 @@ sequenceDiagram
 
 ---
 
+## Dropdown Selection Flow
+
+This diagram details the specific sequence of events triggered when a user clicks on an option within one of the filter dropdowns (Ingredients, Appliances, or Ustensils).
+
+```mermaid
+flowchart TD
+    Click(["User clicks a dropdown option"]) --> Check{"Is option already selected?"}
+    Check -- "Yes" --> Ignore["Return (Do nothing)"]
+    Check -- "No" --> Push["Push item to selectedItems array"]
+    
+    Push --> RenderTags["Call renderSelectedList()\nUpdates yellow tags in UI"]
+    RenderTags --> RenderOpts["Call renderOptionsFor()\nRe-renders current dropdown options"]
+    RenderOpts --> ApplyFilter["Call applyFilter()"]
+    
+    subgraph "Filtering and Rendering"
+        ApplyFilter --> Filter["Call filterRecipes(recipes, selectedItems)"]
+        Filter --> RenderRecipes["Call renderRecipes(filtered)\nUpdates recipe cards in DOM"]
+        RenderRecipes --> UpdateCount["Call updateRecipesResultLabel(count)\nUpdates recipes count text"]
+    end
+```
+
+---
+
 ## File Structure
 
 ```mermaid

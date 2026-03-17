@@ -14,50 +14,50 @@ function normalize(s) {
 // Extrait la liste des ingrédients uniques (tri alphabétique)
 function extractUniqueIngredients(recipes) {
   const seen = new Set();
-  const list = [];
+  //const list = [];
   for (const recipe of recipes) {
     for (const item of recipe.ingredients || []) {
-      const name = (item.ingredient ?? "").trim();
+      const name = item.ingredient ?? "";
       if (!name) continue;
       const key = normalize(name);
-      if (seen.has(key)) continue;
+      //if (seen.has(key)) continue;
       seen.add(key);
-      list.push(name);
+      //list.push(name);
     }
   }
-  return list.sort((a, b) => a.localeCompare(b, "fr"));
+  return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
 }
 
 // Extrait la liste des appareils uniques
 function extractUniqueAppliances(recipes) {
   const seen = new Set();
-  const list = [];
+  //const list = [];
   for (const recipe of recipes) {
-    const name = (recipe.appliance ?? "").trim();
+    const name = recipe.appliance ?? "";
     if (!name) continue;
     const key = normalize(name);
-    if (seen.has(key)) continue;
+    //if (seen.has(key)) continue;
     seen.add(key);
-    list.push(name);
+    //list.push(name);
   }
-  return list.sort((a, b) => a.localeCompare(b, "fr"));
+  return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
 }
 
 // Extrait la liste des ustensiles uniques
 function extractUniqueUstensils(recipes) {
   const seen = new Set();
-  const list = [];
+  //const list = [];
   for (const recipe of recipes) {
     for (const name of recipe.ustensils || []) {
-      const trimmed = String(name ?? "").trim();
+      const trimmed = name ?? ""; //String(name ?? "").trim();
       if (!trimmed) continue;
       const key = normalize(trimmed);
-      if (seen.has(key)) continue;
+      //if (seen.has(key)) continue;
       seen.add(key);
-      list.push(trimmed);
+      //list.push(trimmed);
     }
   }
-  return list.sort((a, b) => a.localeCompare(b, "fr"));
+  return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
 }
 
 // Retourne les recettes qui correspondent à tous les critères sélectionnés
@@ -225,7 +225,7 @@ function initFilters(recipes/*, onFilterChange*/) {
     list.className = "m-0 list-none p-0";
     dropdown.appendChild(list);
 
-    function renderOptionsFor(cfg) {
+    function renderOptionsFor(/*cfg*/) {
       list.innerHTML = "";
       for (const opt of config.options) {
         const selected = isAlreadySelected(config.type, opt);
@@ -233,9 +233,9 @@ function initFilters(recipes/*, onFilterChange*/) {
           if (selected) return;
           selectedItems.push({ type: config.type, value: opt });
           renderSelectedList();
-          configs.forEach((c) => {
+          /*configs.forEach((c) => {
             if (c.key === config.key) renderOptionsFor(c);
-          });
+          });*/
           applyFilter();
         });
         list.appendChild(li);
@@ -255,7 +255,9 @@ function initFilters(recipes/*, onFilterChange*/) {
     renderOptionsFor(config);
   }
 
-  configs.forEach(buildDropdown);
+
+  //configs.forEach(buildDropdown);
+  configs.forEach((config) => buildDropdown(config));
   renderSelectedList();
 
   document.addEventListener("click", () => closeDropdown());
