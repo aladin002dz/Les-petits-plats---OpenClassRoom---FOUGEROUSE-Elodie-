@@ -1,3 +1,5 @@
+import renderRecipes from "./templates/card.js";
+
 /**
  * Filtres recettes : filtre blanc (boutons + listes pour choisir), tag jaune (sélections affichées).
  */
@@ -118,7 +120,7 @@ function createSelectedTagEl(label, onRemove) {
 }
 
 // Initialise les 3 filtres (filtre blanc) et la liste des tags (tag jaune) ; appelle onFilterChange à chaque changement
-function initFilters(recipes, onFilterChange) {
+function initFilters(recipes/*, onFilterChange*/) {
   const ingredientsList = extractUniqueIngredients(recipes);
   const appliancesList = extractUniqueAppliances(recipes);
   const ustensilsList = extractUniqueUstensils(recipes);
@@ -158,7 +160,8 @@ function initFilters(recipes, onFilterChange) {
 
   function applyFilter() {
     const filtered = filterRecipes(recipes, selectedItems);
-    onFilterChange(filtered);
+    //onFilterChange(filtered);
+    renderRecipes(filtered);
   }
 
   // Tag jaune : met à jour l’affichage des tags
@@ -264,9 +267,9 @@ function initFilters(recipes, onFilterChange) {
 }
 
 export {
-  extractUniqueIngredients,
+  /*extractUniqueIngredients,
   extractUniqueAppliances,
   extractUniqueUstensils,
-  filterRecipes,
+  filterRecipes,*/
   initFilters,
 };

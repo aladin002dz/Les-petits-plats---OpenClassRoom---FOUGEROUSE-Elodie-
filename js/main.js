@@ -1,5 +1,6 @@
-import renderRecipes from "./templates/card.js";
+//import renderRecipes from "./templates/card.js";
 import { initFilters } from "./filters.js";
+
 
 async function init() {
   // Charge les recettes depuis recipes.json
@@ -10,9 +11,9 @@ async function init() {
   if (!Array.isArray(recipes)) return;
 
   // Initialise les filtres ; à chaque changement, met à jour la grille et le résultat
-  initFilters(recipes, (filtered) => {
+  initFilters(recipes/*, (filtered) => {
     renderRecipes(filtered);
-  });
+  }*/);
 }
 
 init();
