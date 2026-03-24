@@ -1,3 +1,5 @@
+import renderRecipes from "./templates/card.js";
+
 /**
  * Filtres recettes : filtre blanc (boutons + listes pour choisir), tag jaune (sélections affichées).
  */
@@ -12,50 +14,50 @@ function normalize(s) {
 // Extrait la liste des ingrédients uniques (tri alphabétique)
 function extractUniqueIngredients(recipes) {
   const seen = new Set();
-  const list = [];
+  //const list = [];
   for (const recipe of recipes) {
     for (const item of recipe.ingredients || []) {
-      const name = (item.ingredient ?? "").trim();
+      const name = item.ingredient ?? "";
       if (!name) continue;
       const key = normalize(name);
-      if (seen.has(key)) continue;
+      //if (seen.has(key)) continue;
       seen.add(key);
-      list.push(name);
+      //list.push(name);
     }
   }
-  return list.sort((a, b) => a.localeCompare(b, "fr"));
+  return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
 }
 
 // Extrait la liste des appareils uniques
 function extractUniqueAppliances(recipes) {
   const seen = new Set();
-  const list = [];
+  //const list = [];
   for (const recipe of recipes) {
-    const name = (recipe.appliance ?? "").trim();
+    const name = recipe.appliance ?? "";
     if (!name) continue;
     const key = normalize(name);
-    if (seen.has(key)) continue;
+    //if (seen.has(key)) continue;
     seen.add(key);
-    list.push(name);
+    //list.push(name);
   }
-  return list.sort((a, b) => a.localeCompare(b, "fr"));
+  return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
 }
 
 // Extrait la liste des ustensiles uniques
 function extractUniqueUstensils(recipes) {
   const seen = new Set();
-  const list = [];
+  //const list = [];
   for (const recipe of recipes) {
     for (const name of recipe.ustensils || []) {
-      const trimmed = String(name ?? "").trim();
+      const trimmed = name ?? ""; //String(name ?? "").trim();
       if (!trimmed) continue;
       const key = normalize(trimmed);
-      if (seen.has(key)) continue;
+      //if (seen.has(key)) continue;
       seen.add(key);
-      list.push(trimmed);
+      //list.push(trimmed);
     }
   }
-  return list.sort((a, b) => a.localeCompare(b, "fr"));
+  return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
 }
 
 // Retourne les recettes qui correspondent à tous les critères sélectionnés
@@ -113,18 +115,19 @@ function createSelectedTagEl(label, onRemove) {
     e.preventDefault();
     e.stopPropagation();
     onRemove();
+    tag.remove();
   });
   return tag;
 }
 
 // Initialise les 3 filtres (filtre blanc) et la liste des tags (tag jaune) ; appelle onFilterChange à chaque changement
-function initFilters(recipes, onFilterChange) {
+function initFilters(recipes/*, onFilterChange*/) {
   const ingredientsList = extractUniqueIngredients(recipes);
   const appliancesList = extractUniqueAppliances(recipes);
   const ustensilsList = extractUniqueUstensils(recipes);
 
   /** @type {SelectedItem[]} */
-  const selectedItems = [];
+  const selectedItems = [];//la variable qui stocke les tags des filtres sélectionnés
 
   // Tag jaune : conteneur DOM des tags
   const selectedListEl = document.getElementById("recipes-selected-list");
@@ -158,7 +161,10 @@ function initFilters(recipes, onFilterChange) {
 
   function applyFilter() {
     const filtered = filterRecipes(recipes, selectedItems);
-    onFilterChange(filtered);
+    //onFilterChange(filtered);
+    renderRecipes(filtered);//mettre à jour les recettes filtrées
+    //update the list of tags
+    renderSelectedList(filtered);
   }
 
   // Tag jaune : met à jour l’affichage des tags
@@ -167,10 +173,12 @@ function initFilters(recipes, onFilterChange) {
     selectedListEl.innerHTML = "";
     selectedItems.forEach((item, i) => {
       selectedListEl.appendChild(
+        //createSelectedTagEl(item.value)
         createSelectedTagEl(item.value, () => {
+          //pour gérer la suppression d'un tag de filtre
           selectedItems.splice(i, 1);
-          renderSelectedList();
           applyFilter();
+          //renderSelectedList();
         })
       );
     });
@@ -222,7 +230,7 @@ function initFilters(recipes, onFilterChange) {
     list.className = "m-0 list-none p-0";
     dropdown.appendChild(list);
 
-    function renderOptionsFor(cfg) {
+    function renderOptionsFor(/*cfg*/) {
       list.innerHTML = "";
       for (const opt of config.options) {
         const selected = isAlreadySelected(config.type, opt);
@@ -230,9 +238,10 @@ function initFilters(recipes, onFilterChange) {
           if (selected) return;
           selectedItems.push({ type: config.type, value: opt });
           renderSelectedList();
-          configs.forEach((c) => {
+          closeDropdown();
+          /*configs.forEach((c) => {
             if (c.key === config.key) renderOptionsFor(c);
-          });
+          });*/
           applyFilter();
         });
         list.appendChild(li);
@@ -252,7 +261,9 @@ function initFilters(recipes, onFilterChange) {
     renderOptionsFor(config);
   }
 
-  configs.forEach(buildDropdown);
+
+  //configs.forEach(buildDropdown);
+  configs.forEach((config) => buildDropdown(config));
   renderSelectedList();
 
   document.addEventListener("click", () => closeDropdown());
@@ -264,9 +275,9 @@ function initFilters(recipes, onFilterChange) {
 }
 
 export {
-  extractUniqueIngredients,
+  /*extractUniqueIngredients,
   extractUniqueAppliances,
   extractUniqueUstensils,
-  filterRecipes,
+  filterRecipes,*/
   initFilters,
 };
