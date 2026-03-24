@@ -115,6 +115,7 @@ function createSelectedTagEl(label, onRemove) {
     e.preventDefault();
     e.stopPropagation();
     onRemove();
+    tag.remove();
   });
   return tag;
 }
@@ -126,7 +127,7 @@ function initFilters(recipes/*, onFilterChange*/) {
   const ustensilsList = extractUniqueUstensils(recipes);
 
   /** @type {SelectedItem[]} */
-  const selectedItems = [];
+  const selectedItems = [];//la variable qui stocke les tags des filtres sélectionnés
 
   // Tag jaune : conteneur DOM des tags
   const selectedListEl = document.getElementById("recipes-selected-list");
@@ -161,7 +162,9 @@ function initFilters(recipes/*, onFilterChange*/) {
   function applyFilter() {
     const filtered = filterRecipes(recipes, selectedItems);
     //onFilterChange(filtered);
-    renderRecipes(filtered);
+    renderRecipes(filtered);//mettre à jour les recettes filtrées
+    //update the list of tags
+    renderSelectedList(filtered);
   }
 
   // Tag jaune : met à jour l’affichage des tags
@@ -170,10 +173,12 @@ function initFilters(recipes/*, onFilterChange*/) {
     selectedListEl.innerHTML = "";
     selectedItems.forEach((item, i) => {
       selectedListEl.appendChild(
+        //createSelectedTagEl(item.value)
         createSelectedTagEl(item.value, () => {
+          //pour gérer la suppression d'un tag de filtre
           selectedItems.splice(i, 1);
-          renderSelectedList();
           applyFilter();
+          //renderSelectedList();
         })
       );
     });
@@ -233,6 +238,7 @@ function initFilters(recipes/*, onFilterChange*/) {
           if (selected) return;
           selectedItems.push({ type: config.type, value: opt });
           renderSelectedList();
+          closeDropdown();
           /*configs.forEach((c) => {
             if (c.key === config.key) renderOptionsFor(c);
           });*/
