@@ -16,12 +16,13 @@ function recipeFactory(data) {
    */
   const article = document.createElement("article");
   article.className =
-    "flex max-h-[731px] h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-light-gray";
+    "flex h-full max-h-[731px] flex-col overflow-hidden rounded-card bg-white shadow-sm ring-1 ring-light-gray";
   article.setAttribute("data-recipe-id", String(id));
 
   // Image
   const figure = document.createElement("figure");
-  figure.className = "relative min-h-[253px] h-48 w-full overflow-hidden bg-light-gray";
+  figure.className =
+    "relative h-48 min-h-[253px] w-full overflow-hidden bg-light-gray";
 
   const img = document.createElement("img");
   img.src = IMAGE_BASE_PATH.replace(/\/?$/, "/") + image;
@@ -30,7 +31,7 @@ function recipeFactory(data) {
 
   const timeBadge = document.createElement("p");
   timeBadge.className =
-    "pointer-events-none absolute right-3 top-3 inline-flex items-center justify-center rounded-full bg-primary px-3 py-1.5 font-[family-name:Manrope,sans-serif] text-xs font-normal leading-none tracking-normal text-dark";
+    "pointer-events-none absolute right-3 top-3 inline-flex items-center justify-center rounded-full bg-primary px-3 py-1.5 font-manrope text-xs font-normal leading-none tracking-normal text-dark";
   timeBadge.textContent = `${time} min`;
 
   figure.appendChild(img);
@@ -44,29 +45,29 @@ function recipeFactory(data) {
   header.className = "flex items-start justify-between gap-2";
 
   const title = document.createElement("h2");
-  title.className = "font-[Anton] text-lg font-normal leading-none tracking-normal text-dark pb-4";
+  title.className = "font-Anton text-lg font-normal leading-none tracking-normal text-dark pb-4";
   title.textContent = name;
 
   header.appendChild(title);
 
   const recipeHeading = document.createElement("h3");
   recipeHeading.className =
-    "font-[Manrope] text-xs font-bold leading-none tracking-[0.09em] pb-2 uppercase text-gray";
+    "font-manrope text-xs font-bold leading-none tracking-[0.09em] pb-2 uppercase text-gray";
   recipeHeading.textContent = "Recette";
 
   const descriptionEl = document.createElement("p");
   descriptionEl.className =
-    "line-clamp-4 mb-6 font-[Manrope] text-sm font-normal leading-normal tracking-normal text-dark";
+    "line-clamp-4 mb-6 font-manrope text-sm font-normal leading-normal tracking-normal text-dark";
   descriptionEl.textContent = description;
 
   const ingredientsHeading = document.createElement("h3");
   ingredientsHeading.className =
-    "font-[Manrope] mb-1 text-xs font-bold leading-none tracking-[0.09em] uppercase text-gray";
+    "font-manrope mb-1 text-xs font-bold leading-none tracking-[0.09em] uppercase text-gray";
   ingredientsHeading.textContent = "Ingrédients";
 
   const ingredientsList = document.createElement("ul");
   ingredientsList.className =
-    "grid grid-cols-2 gap-x-10fr gap-y-6 pt-2 text-xs text-gray";
+    "grid grid-cols-2 gap-x-10 gap-y-6 pt-2 text-xs text-gray";
 
   ingredients.forEach((item) => {
     const li = document.createElement("li");
@@ -74,12 +75,12 @@ function recipeFactory(data) {
 
     const nameSpan = document.createElement("span");
     nameSpan.className =
-      "font-[Manrope] text-sm font-medium leading-none tracking-normal text-dark";
+      "font-manrope text-sm font-medium leading-none tracking-normal text-dark";
     nameSpan.textContent = item.ingredient;
 
     const detailsSpan = document.createElement("span");
     detailsSpan.className =
-      "font-[Manrope] text-sm font-normal leading-none tracking-normal text-gray";
+      "font-manrope text-sm font-normal leading-none tracking-normal text-gray";
 
     const quantity = item.quantity ?? "";
     const unit = item.unit ?? item.unite ?? "";

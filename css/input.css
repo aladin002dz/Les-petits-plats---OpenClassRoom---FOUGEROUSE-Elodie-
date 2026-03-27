@@ -4,7 +4,7 @@
 @source "../*.html";
 @source "../**/*.js";
 
-/* Variables de design */
+/* Variables de design : couleurs, typo, rayons, espacements généraux */
 @theme {
   /* Couleurs */
   --color-primary: #ffd15b;
@@ -14,10 +14,19 @@
   --color-light-gray: #ededed;
 
   /* Typographie */
-  --font-Anton: 'Anton', sans-serif;
-  --font-Manrope: 'Manrope', sans-serif;
+  --font-Anton: "Anton", sans-serif;
+  --font-manrope: "Manrope", sans-serif;
 
-  /* Tailles de police */
   --text-heading: 44px;
   --text-result: 21px;
+
+  /* Border Radius */
+  --radius-ui: 10px;
+  --radius-card: 1rem;
+
+  /* Gap */
+  --gap-filters: 65px;
+
+  /* Shadow*/
+  --shadow-search: 0 4px 24px rgb(0 0 0 / 0.18);
 }
