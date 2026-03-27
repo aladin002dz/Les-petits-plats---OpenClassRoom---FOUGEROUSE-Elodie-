@@ -1,4 +1,3 @@
-//import updateRecipesResultLabel from "./resultats.js";
 
 // Chemin des images de recettes (relatif à index.html).
 const IMAGE_BASE_PATH = "./assets/images/recettes/";
@@ -15,7 +14,6 @@ function recipeFactory(data) {
    * Construit la carte DOM pour la recette, stylée avec Tailwind.
    * @returns {HTMLElement}
    */
-  /*function getRecipeCardDOM() {*/
   const article = document.createElement("article");
   article.className =
     "flex max-h-[731px] h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-light-gray";
@@ -106,14 +104,6 @@ function recipeFactory(data) {
   article.appendChild(content);
 
   return article;
-  /*}
-
-  return {
-    id,
-    name,
-    time,
-    getRecipeCardDOM,
-  };*/
 }
 
 /**
@@ -123,20 +113,13 @@ function recipeFactory(data) {
 function renderRecipes(recipeList) {
   const grid = document.getElementById("recipes-grid");
 
-  /*
-    if (!grid) {
-      return;
-    }
-  */
   grid.innerHTML = "";
 
   recipeList.forEach((recipe) => {
-    //const { getRecipeCardDOM } = recipeFactory(recipe);
     const card = recipeFactory(recipe); //getRecipeCardDOM();
     grid.appendChild(card);
   });
 
-  /*updateRecipesResultLabel(recipeList.length);*/
   const total = recipeList.length;
   const element = document.getElementById("recipes-count");
   element.textContent = `${total} recette${total > 1 ? "s" : ""}`;

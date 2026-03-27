@@ -14,15 +14,12 @@ function normalize(s) {
 // Extrait la liste des ingrédients uniques (tri alphabétique)
 function extractUniqueIngredients(recipes) {
   const seen = new Set();
-  //const list = [];
   for (const recipe of recipes) {
     for (const item of recipe.ingredients || []) {
       const name = item.ingredient ?? "";
       if (!name) continue;
       const key = normalize(name);
-      //if (seen.has(key)) continue;
       seen.add(key);
-      //list.push(name);
     }
   }
   return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
@@ -31,14 +28,11 @@ function extractUniqueIngredients(recipes) {
 // Extrait la liste des appareils uniques
 function extractUniqueAppliances(recipes) {
   const seen = new Set();
-  //const list = [];
   for (const recipe of recipes) {
     const name = recipe.appliance ?? "";
     if (!name) continue;
     const key = normalize(name);
-    //if (seen.has(key)) continue;
     seen.add(key);
-    //list.push(name);
   }
   return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
 }
@@ -46,15 +40,12 @@ function extractUniqueAppliances(recipes) {
 // Extrait la liste des ustensiles uniques
 function extractUniqueUstensils(recipes) {
   const seen = new Set();
-  //const list = [];
   for (const recipe of recipes) {
     for (const name of recipe.ustensils || []) {
-      const trimmed = name ?? ""; //String(name ?? "").trim();
+      const trimmed = name ?? ""; 
       if (!trimmed) continue;
       const key = normalize(trimmed);
-      //if (seen.has(key)) continue;
       seen.add(key);
-      //list.push(trimmed);
     }
   }
   return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
@@ -161,9 +152,7 @@ function initFilters(recipes/*, onFilterChange*/) {
 
   function applyFilter() {
     const filtered = filterRecipes(recipes, selectedItems);
-    //onFilterChange(filtered);
     renderRecipes(filtered);//mettre à jour les recettes filtrées
-    //update the list of tags
     renderSelectedList(filtered);
   }
 
@@ -173,12 +162,10 @@ function initFilters(recipes/*, onFilterChange*/) {
     selectedListEl.innerHTML = "";
     selectedItems.forEach((item, i) => {
       selectedListEl.appendChild(
-        //createSelectedTagEl(item.value)
         createSelectedTagEl(item.value, () => {
           //pour gérer la suppression d'un tag de filtre
           selectedItems.splice(i, 1);
           applyFilter();
-          //renderSelectedList();
         })
       );
     });
@@ -239,9 +226,6 @@ function initFilters(recipes/*, onFilterChange*/) {
           selectedItems.push({ type: config.type, value: opt });
           renderSelectedList();
           closeDropdown();
-          /*configs.forEach((c) => {
-            if (c.key === config.key) renderOptionsFor(c);
-          });*/
           applyFilter();
         });
         list.appendChild(li);
@@ -262,7 +246,6 @@ function initFilters(recipes/*, onFilterChange*/) {
   }
 
 
-  //configs.forEach(buildDropdown);
   configs.forEach((config) => buildDropdown(config));
   renderSelectedList();
 
@@ -275,9 +258,5 @@ function initFilters(recipes/*, onFilterChange*/) {
 }
 
 export {
-  /*extractUniqueIngredients,
-  extractUniqueAppliances,
-  extractUniqueUstensils,
-  filterRecipes,*/
   initFilters,
 };
