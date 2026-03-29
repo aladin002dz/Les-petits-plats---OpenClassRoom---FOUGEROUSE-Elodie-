@@ -2,6 +2,8 @@
 
 Projet P7 de la formation Développeur d'application JavaScript React (OpenClassroom). Site de recettes de cuisine pour l'entreprise « Les petits plats », avec un moteur de recherche performant (recherche principale + filtres par tags), deux implémentations d'algorithme comparées (boucles natives vs programmation fonctionnelle) et une interface responsive réalisée avec Tailwind CSS.
 
+![Aperçu du projet](assets/images/Preview.png)
+
 ---
 
 ## Présentation du projet
