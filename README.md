@@ -41,7 +41,7 @@ Deux implémentations de `recipeMatchesSearch` développées sur des branches Gi
 
 **Algorithme retenu : boucles natives** — testé sur Jsben.ch, 38% plus rapide car il n'alloue pas de tableau intermédiaire et effectue un retour anticipé dès le premier champ correspondant.
 
-Voir [fiche_investigation.md](fiche_investigation.md) pour le détail complet (pseudocode, algorigrammes, résultats, recommandation).
+Voir la fiche d'investigation de fonctionnalité pour le détail complet (pseudocode, algorigrammes, résultats, recommandation).
 
 ## Technologies
 
@@ -93,7 +93,7 @@ Ensuite ouvrir `index.html` dans un navigateur (ou via un serveur local).
 
 - Interface de recherche responsive, code validable W3C.
 - Deux branches Git avec deux implémentations de l'algorithme de recherche.
-- [Fiche d'investigation de fonctionnalité](fiche_investigation.md) : pseudocode, algorigrammes Mermaid, résultats Jsben.ch, recommandation.
+- Fiche d'investigation de fonctionnalité : pseudocode, algorigrammes Mermaid, résultats Jsben.ch, recommandation.
 
 ## Auteur
 
