@@ -1,40 +1,18 @@
 import renderRecipes from "./templates/card.js";
-import { normalize, recipeMatchesSearch } from "./recipeSearch.js";
+import { normalize, stem, recipeMatchesSearch } from "./recipeSearch.js";
 
 // Filtres recettes : filtre blanc (boutons + listes pour choisir), tag jaune (sélections affichées).
 
-// Extrait la liste des ingrédients uniques (tri alphabétique)
-function extractUniqueIngredients(recipes) {
-  const seen = new Set();
-  for (const recipe of recipes) {
-    for (const item of recipe.ingredients) {
-      if (!item.ingredient) continue;
-      seen.add(normalize(item.ingredient));
-    }
+// Extrait les valeurs uniques d'une liste (tri alphabétique), singulier et pluriel fusionnés
+function extractUnique(values) {
+  const seen = new Map();
+  for (const value of values) {
+    if (!value) continue;
+    const label = normalize(value);
+    const key = stem(label);
+    if (!seen.has(key)) seen.set(key, label);
   }
-  return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
-}
-
-// Extrait la liste des appareils uniques
-function extractUniqueAppliances(recipes) {
-  const seen = new Set();
-  for (const recipe of recipes) {
-    if (!recipe.appliance) continue;
-    seen.add(normalize(recipe.appliance));
-  }
-  return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
-}
-
-// Extrait la liste des ustensiles uniques
-function extractUniqueUstensils(recipes) {
-  const seen = new Set();
-  for (const recipe of recipes) {
-    for (const name of recipe.ustensils) {
-      if (!name) continue;
-      seen.add(normalize(name));
-    }
-  }
-  return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
+  return [...seen.values()].sort((a, b) => a.localeCompare(b, "fr"));
 }
 
 // Retourne les recettes qui correspondent à la recherche et à tous les critères sélectionnés
@@ -44,13 +22,13 @@ function filterRecipes(recipes, selectedItems, searchQuery) {
     if (!recipeMatchesSearch(recipe, q)) return false;
     for (const item of selectedItems) {
       if (item.type === "ingredient") {
-        const recipeIng = new Set(recipe.ingredients.map((i) => normalize(i.ingredient)));
-        if (!recipeIng.has(normalize(item.value))) return false;
+        const recipeIng = new Set(recipe.ingredients.map((i) => stem(normalize(i.ingredient))));
+        if (!recipeIng.has(stem(normalize(item.value)))) return false;
       } else if (item.type === "appliance") {
-        if (normalize(recipe.appliance) !== normalize(item.value)) return false;
+        if (stem(normalize(recipe.appliance)) !== stem(normalize(item.value))) return false;
       } else if (item.type === "ustensil") {
-        const recipeUst = new Set(recipe.ustensils.map((u) => normalize(u)));
-        if (!recipeUst.has(normalize(item.value))) return false;
+        const recipeUst = new Set(recipe.ustensils.map((u) => stem(normalize(u))));
+        if (!recipeUst.has(stem(normalize(item.value)))) return false;
       }
     }
     return true;
@@ -96,36 +74,41 @@ function createSelectedTagEl(label, onRemove) {
 
 // Initialise les 3 filtres (filtre blanc) et la liste des tags (tag jaune)
 function initRecipe(recipes) {
-  const ingredientsList = extractUniqueIngredients(recipes);
-  const appliancesList = extractUniqueAppliances(recipes);
-  const ustensilsList = extractUniqueUstensils(recipes);
-
-  // La variable qui stocke les tags des filtres sélectionnés
+  // Les critères de filtre actuellement sélectionnés (ingrédient, appareil ou ustensile)
   const selectedItems = [];
-
   let searchQuery = "";
 
   // Tag jaune : conteneur DOM des tags
   const selectedListEl = document.getElementById("recipes-selected-list");
 
-  // Filtre blanc : config des 3 boutons (Ingrédients, Appareils, Ustensiles) et leurs listes
+  // Collecte toutes les valeurs brutes depuis les recettes
+  const allIngredients = [];
+  const allAppliances = [];
+  const allUstensils = [];
+  for (const recipe of recipes) {
+    for (const item of recipe.ingredients) allIngredients.push(item.ingredient);
+    allAppliances.push(recipe.appliance);
+    for (const name of recipe.ustensils) allUstensils.push(name);
+  }
+
+  // Filtre blanc : config des 3 boutons (Ingrédients, Appareils, Ustensiles) avec leurs options extraites des recettes
   const configs = [
     {
       type: "ingredient",
       label: "Ingrédients",
-      options: ingredientsList,
+      options: extractUnique(allIngredients),
       btnSelector: '[data-filter="ingredients"]',
     },
     {
       type: "appliance",
       label: "Appareils",
-      options: appliancesList,
+      options: extractUnique(allAppliances),
       btnSelector: '[data-filter="appliances"]',
     },
     {
       type: "ustensil",
       label: "Ustensiles",
-      options: ustensilsList,
+      options: extractUnique(allUstensils),
       btnSelector: '[data-filter="ustensils"]',
     },
   ];

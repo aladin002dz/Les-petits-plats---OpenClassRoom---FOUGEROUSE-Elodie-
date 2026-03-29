@@ -650,11 +650,6 @@
   .uppercase {
     text-transform: uppercase;
   }
-  .placeholder-gray-400 {
-    &::placeholder {
-      color: var(--color-gray-400);
-    }
-  }
   .opacity-100 {
     opacity: 100%;
   }
