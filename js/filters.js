@@ -188,18 +188,51 @@ function initRecipe(recipes) {
 
     const dropdown = document.createElement("div");
     dropdown.className =
-      "absolute left-0 top-full z-50 mt-1 hidden min-w-[195px] max-h-[280px] overflow-y-auto rounded-ui bg-white py-2 shadow-lg";
+      "absolute left-0 top-full z-50 mt-1 hidden min-w-[195px] rounded-ui bg-white shadow-lg";
     dropdown.setAttribute("role", "listbox");
     dropdown.setAttribute("aria-label", config.label);
     wrapper.appendChild(dropdown);
 
+    // Barre de recherche dans le dropdown
+    const searchWrapper = document.createElement("div");
+    searchWrapper.className = "relative flex items-center border border-gray-300 rounded-md mx-3 mt-3 mb-2";
+
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.className = "w-full py-2 pl-3 pr-8 font-manrope text-sm text-dark bg-transparent outline-none";
+    searchInput.setAttribute("aria-label", `Rechercher dans ${config.label}`);
+
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.className = "absolute right-7 hidden text-gray-400 hover:text-dark";
+    clearBtn.setAttribute("aria-label", "Effacer la recherche");
+    clearBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+
+    const searchIcon = document.createElement("span");
+    searchIcon.className = "absolute right-2 text-gray-400 pointer-events-none";
+    searchIcon.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/><line x1="10" y1="10" x2="13" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+
+    searchWrapper.appendChild(searchInput);
+    searchWrapper.appendChild(clearBtn);
+    searchWrapper.appendChild(searchIcon);
+    dropdown.appendChild(searchWrapper);
+
     const list = document.createElement("ul");
-    list.className = "m-0 list-none p-0";
+    list.className = "m-0 list-none p-0 max-h-[220px] overflow-y-auto pb-2";
     dropdown.appendChild(list);
+
+    const normalizedOptions = config.options.map((opt) => ({ label: opt, normalized: normalize(opt) }));
+
+    function resetSearch() {
+      searchInput.value = "";
+      clearBtn.classList.add("hidden");
+    }
 
     function renderOptionsFor() {
       list.innerHTML = "";
-      for (const opt of config.options) {
+      const q = normalize(searchInput.value);
+      const filtered = q ? normalizedOptions.filter((o) => o.normalized.includes(q)) : normalizedOptions;
+      for (const { label: opt } of filtered) {
         const selected = isAlreadySelected(config.type, opt);
         const li = createOptionEl(opt, selected, () => {
           if (selected) return;
@@ -212,13 +245,30 @@ function initRecipe(recipes) {
       }
     }
 
+    searchInput.addEventListener("input", (e) => {
+      e.stopPropagation();
+      clearBtn.classList.toggle("hidden", searchInput.value === "");
+      renderOptionsFor();
+    });
+
+    clearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      resetSearch();
+      renderOptionsFor();
+      searchInput.focus();
+    });
+
+    searchInput.addEventListener("click", (e) => e.stopPropagation());
+
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       if (dropdown.classList.contains("block")) {
         closeDropdown();
       } else {
         openDropdownFor(dropdown);
+        resetSearch();
         renderOptionsFor();
+        searchInput.focus();
       }
     });
 
