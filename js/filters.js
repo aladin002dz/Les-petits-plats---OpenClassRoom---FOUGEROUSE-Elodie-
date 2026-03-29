@@ -1,26 +1,15 @@
 import renderRecipes from "./templates/card.js";
-import { attachSearch } from "./search.js";
+import { normalize, recipeMatchesSearch } from "./recipeSearch.js";
 
-/**
- * Filtres recettes : filtre blanc (boutons + listes pour choisir), tag jaune (sélections affichées).
- */
-
-/** @typedef {{ type: 'ingredient'|'appliance'|'ustensil', value: string }} SelectedItem */
-
-// Normalise une chaîne pour comparaison (minuscules, trim)
-function normalize(s) {
-  return String(s ?? "").trim().toLowerCase();
-}
+// Filtres recettes : filtre blanc (boutons + listes pour choisir), tag jaune (sélections affichées).
 
 // Extrait la liste des ingrédients uniques (tri alphabétique)
 function extractUniqueIngredients(recipes) {
   const seen = new Set();
   for (const recipe of recipes) {
-    for (const item of recipe.ingredients || []) {
-      const name = item.ingredient ?? "";
-      if (!name) continue;
-      const key = normalize(name);
-      seen.add(key);
+    for (const item of recipe.ingredients) {
+      if (!item.ingredient) continue;
+      seen.add(normalize(item.ingredient));
     }
   }
   return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
@@ -30,10 +19,8 @@ function extractUniqueIngredients(recipes) {
 function extractUniqueAppliances(recipes) {
   const seen = new Set();
   for (const recipe of recipes) {
-    const name = recipe.appliance ?? "";
-    if (!name) continue;
-    const key = normalize(name);
-    seen.add(key);
+    if (!recipe.appliance) continue;
+    seen.add(normalize(recipe.appliance));
   }
   return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
 }
@@ -42,29 +29,12 @@ function extractUniqueAppliances(recipes) {
 function extractUniqueUstensils(recipes) {
   const seen = new Set();
   for (const recipe of recipes) {
-    for (const name of recipe.ustensils || []) {
-      const trimmed = name ?? ""; 
-      if (!trimmed) continue;
-      const key = normalize(trimmed);
-      seen.add(key);
+    for (const name of recipe.ustensils) {
+      if (!name) continue;
+      seen.add(normalize(name));
     }
   }
   return [...seen].sort((a, b) => a.localeCompare(b, "fr"));
-}
-
-// Texte indexé pour la recherche principale (nom, description, ingrédients)
-function recipeSearchText(recipe) {
-  const parts = [
-    recipe.name,
-    recipe.description,
-    ...(recipe.ingredients || []).map((i) => i.ingredient ?? ""),
-  ];
-  return normalize(parts.join(" "));
-}
-
-function recipeMatchesSearch(recipe, normalizedQuery) {
-  if (!normalizedQuery) return true;
-  return recipeSearchText(recipe).includes(normalizedQuery);
 }
 
 // Retourne les recettes qui correspondent à la recherche et à tous les critères sélectionnés
@@ -74,16 +44,12 @@ function filterRecipes(recipes, selectedItems, searchQuery) {
     if (!recipeMatchesSearch(recipe, q)) return false;
     for (const item of selectedItems) {
       if (item.type === "ingredient") {
-        const recipeIng = new Set(
-          (recipe.ingredients || []).map((i) => normalize(i.ingredient ?? ""))
-        );
+        const recipeIng = new Set(recipe.ingredients.map((i) => normalize(i.ingredient)));
         if (!recipeIng.has(normalize(item.value))) return false;
       } else if (item.type === "appliance") {
-        if (normalize(recipe.appliance ?? "") !== normalize(item.value)) return false;
+        if (normalize(recipe.appliance) !== normalize(item.value)) return false;
       } else if (item.type === "ustensil") {
-        const recipeUst = new Set(
-          (recipe.ustensils || []).map((u) => normalize(String(u)))
-        );
+        const recipeUst = new Set(recipe.ustensils.map((u) => normalize(u)));
         if (!recipeUst.has(normalize(item.value))) return false;
       }
     }
@@ -91,7 +57,7 @@ function filterRecipes(recipes, selectedItems, searchQuery) {
   });
 }
 
-// Filtre blanc : une ligne cliquable dans la liste déroulante (ingrédient, appareil ou ustensile)
+// Filtre blanc : une ligne cliquable dans la liste déroulante
 function createOptionEl(label, selected, onSelect) {
   const li = document.createElement("li");
   li.className =
@@ -121,7 +87,6 @@ function createSelectedTagEl(label, onRemove) {
     '<svg class="shrink-0 opacity-100" width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="2.17" stroke-linecap="round"/></svg>';
   tag.innerHTML = `<span class="min-w-0 flex-1 truncate">${escapeHtml(label)}</span> <button type="button" class="inline-flex h-[20px] w-[20px] shrink-0 items-center justify-center border-0 bg-transparent p-0 cursor-pointer text-dark opacity-100 m-0 hover:opacity-90" aria-label="Retirer ${escapeHtml(label)}">${crossSvg}</button>`;
   tag.querySelector("button").addEventListener("click", (e) => {
-    e.preventDefault();
     e.stopPropagation();
     onRemove();
     tag.remove();
@@ -129,14 +94,14 @@ function createSelectedTagEl(label, onRemove) {
   return tag;
 }
 
-// Initialise les 3 filtres (filtre blanc) et la liste des tags (tag jaune) ; appelle onFilterChange à chaque changement
-function initFilters(recipes/*, onFilterChange*/) {
+// Initialise les 3 filtres (filtre blanc) et la liste des tags (tag jaune)
+function initRecipe(recipes) {
   const ingredientsList = extractUniqueIngredients(recipes);
   const appliancesList = extractUniqueAppliances(recipes);
   const ustensilsList = extractUniqueUstensils(recipes);
 
-  /** @type {SelectedItem[]} */
-  const selectedItems = [];//la variable qui stocke les tags des filtres sélectionnés
+  // La variable qui stocke les tags des filtres sélectionnés
+  const selectedItems = [];
 
   let searchQuery = "";
 
@@ -146,21 +111,18 @@ function initFilters(recipes/*, onFilterChange*/) {
   // Filtre blanc : config des 3 boutons (Ingrédients, Appareils, Ustensiles) et leurs listes
   const configs = [
     {
-      key: "ingredients",
       type: "ingredient",
       label: "Ingrédients",
       options: ingredientsList,
       btnSelector: '[data-filter="ingredients"]',
     },
     {
-      key: "appliances",
       type: "appliance",
       label: "Appareils",
       options: appliancesList,
       btnSelector: '[data-filter="appliances"]',
     },
     {
-      key: "ustensils",
       type: "ustensil",
       label: "Ustensiles",
       options: ustensilsList,
@@ -172,18 +134,16 @@ function initFilters(recipes/*, onFilterChange*/) {
 
   function applyFilter() {
     const filtered = filterRecipes(recipes, selectedItems, searchQuery);
-    renderRecipes(filtered);//mettre à jour les recettes filtrées
-    renderSelectedList(filtered);
+    renderRecipes(filtered);
+    renderSelectedList();
   }
 
-  // Tag jaune : met à jour l’affichage des tags
+  // Tag jaune : met à jour l'affichage des tags
   function renderSelectedList() {
-    if (!selectedListEl) return;
     selectedListEl.innerHTML = "";
     selectedItems.forEach((item, i) => {
       selectedListEl.appendChild(
         createSelectedTagEl(item.value, () => {
-          //pour gérer la suppression d'un tag de filtre
           selectedItems.splice(i, 1);
           applyFilter();
         })
@@ -216,7 +176,7 @@ function initFilters(recipes/*, onFilterChange*/) {
     );
   }
 
-  // Filtre blanc : crée le bouton + la liste déroulante pour un type (ingrédients, appareils ou ustensiles)
+  // Filtre blanc : crée le bouton + la liste déroulante pour un type
   function buildDropdown(config) {
     const btn = document.querySelector(config.btnSelector);
     if (!btn) return;
@@ -237,7 +197,7 @@ function initFilters(recipes/*, onFilterChange*/) {
     list.className = "m-0 list-none p-0";
     dropdown.appendChild(list);
 
-    function renderOptionsFor(/*cfg*/) {
+    function renderOptionsFor() {
       list.innerHTML = "";
       for (const opt of config.options) {
         const selected = isAlreadySelected(config.type, opt);
@@ -258,23 +218,15 @@ function initFilters(recipes/*, onFilterChange*/) {
         closeDropdown();
       } else {
         openDropdownFor(dropdown);
-        renderOptionsFor(config);
+        renderOptionsFor();
       }
     });
 
-    renderOptionsFor(config);
+    renderOptionsFor();
   }
-
 
   configs.forEach((config) => buildDropdown(config));
   renderSelectedList();
-
-  attachSearch({
-    onQueryChange: (value) => {
-      searchQuery = value;
-      applyFilter();
-    },
-  });
 
   document.addEventListener("click", () => closeDropdown());
   document.addEventListener("keydown", (e) => {
@@ -282,8 +234,15 @@ function initFilters(recipes/*, onFilterChange*/) {
   });
 
   applyFilter();
+
+  return {
+    setSearchQuery(value) {
+      searchQuery = value;
+      applyFilter();
+    },
+  };
 }
 
 export {
-  initFilters,
+  initRecipe,
 };
