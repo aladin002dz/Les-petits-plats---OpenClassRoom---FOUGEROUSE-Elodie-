@@ -1,31 +1,20 @@
-
 // Chemin des images de recettes (relatif à index.html).
 const IMAGE_BASE_PATH = "./assets/images/recettes/";
 
-/**
- * Factory pattern pour une recette.
- * @param {Object} data - Objet recette provenant de `recipes`.
- * @returns {{ id: number, name: string, time: number, getRecipeCardDOM: () => HTMLElement }}
- */
-function recipeFactory(data) {
-  const { id, name, image, time, ingredients, description } = data;
+// Construit la carte DOM d'une recette (recipe : objet recette provenant de recipes.json)
+function createRecipeCard(recipe) {
+  const { name, image, time, ingredients, description } = recipe;
 
-  /**
-   * Construit la carte DOM pour la recette, stylée avec Tailwind.
-   * @returns {HTMLElement}
-   */
   const article = document.createElement("article");
   article.className =
     "flex h-full max-h-[731px] flex-col overflow-hidden rounded-card bg-white shadow-sm ring-1 ring-light-gray";
-  article.setAttribute("data-recipe-id", String(id));
 
   // Image
   const figure = document.createElement("figure");
-  figure.className =
-    "relative h-48 min-h-[253px] w-full overflow-hidden bg-light-gray";
+  figure.className = "relative h-48 min-h-[253px] w-full overflow-hidden bg-light-gray";
 
   const img = document.createElement("img");
-  img.src = IMAGE_BASE_PATH.replace(/\/?$/, "/") + image;
+  img.src = IMAGE_BASE_PATH + image;
   img.alt = name;
   img.className = "h-full w-full object-cover";
 
@@ -41,14 +30,9 @@ function recipeFactory(data) {
   const content = document.createElement("div");
   content.className = "flex flex-1 flex-col gap-3 px-6 py-10";
 
-  const header = document.createElement("header");
-  header.className = "flex items-start justify-between gap-2";
-
   const title = document.createElement("h2");
   title.className = "font-Anton text-lg font-normal leading-none tracking-normal text-dark pb-4";
   title.textContent = name;
-
-  header.appendChild(title);
 
   const recipeHeading = document.createElement("h3");
   recipeHeading.className =
@@ -66,10 +50,9 @@ function recipeFactory(data) {
   ingredientsHeading.textContent = "Ingrédients";
 
   const ingredientsList = document.createElement("ul");
-  ingredientsList.className =
-    "grid grid-cols-2 gap-x-10 gap-y-6 pt-2 text-xs text-gray";
+  ingredientsList.className = "grid grid-cols-2 gap-x-10 gap-y-6 pt-2 text-xs text-gray";
 
-  ingredients.forEach((item) => {
+  for (const item of ingredients) {
     const li = document.createElement("li");
     li.className = "flex flex-col gap-1.5";
 
@@ -78,24 +61,23 @@ function recipeFactory(data) {
       "font-manrope text-sm font-medium leading-none tracking-normal text-dark";
     nameSpan.textContent = item.ingredient;
 
-    const detailsSpan = document.createElement("span");
-    detailsSpan.className =
-      "font-manrope text-sm font-normal leading-none tracking-normal text-gray";
-
-    const quantity = item.quantity ?? "";
-    const unit = item.unit ?? item.unite ?? "";
-    const parts = [quantity, unit].filter(Boolean);
-    detailsSpan.textContent = parts.length ? parts.join(" ") : "";
+    const quantity = item.quantity || "";
+    const unit = item.unit || item.unite || "";
+    const detail = [quantity, unit].filter(Boolean).join(" ");
 
     li.appendChild(nameSpan);
-    if (detailsSpan.textContent) {
+    if (detail) {
+      const detailsSpan = document.createElement("span");
+      detailsSpan.className =
+        "font-manrope text-sm font-normal leading-none tracking-normal text-gray";
+      detailsSpan.textContent = detail;
       li.appendChild(detailsSpan);
     }
 
     ingredientsList.appendChild(li);
-  });
+  }
 
-  content.appendChild(header);
+  content.appendChild(title);
   content.appendChild(recipeHeading);
   content.appendChild(descriptionEl);
   content.appendChild(ingredientsHeading);
@@ -107,24 +89,17 @@ function recipeFactory(data) {
   return article;
 }
 
-/**
- * Affiche une liste de recettes dans le conteneur prévu.
- * @param {Array<Object>} recipeList
- */
+// Affiche une liste de recettes dans le conteneur prévu (recipeList : tableau de recettes)
 function renderRecipes(recipeList) {
   const grid = document.getElementById("recipes-grid");
-
   grid.innerHTML = "";
 
-  recipeList.forEach((recipe) => {
-    const card = recipeFactory(recipe); //getRecipeCardDOM();
-    grid.appendChild(card);
-  });
+  for (const recipe of recipeList) {
+    grid.appendChild(createRecipeCard(recipe));
+  }
 
   const total = recipeList.length;
-  const element = document.getElementById("recipes-count");
-  element.textContent = `${total} recette${total > 1 ? "s" : ""}`;
+  document.getElementById("recipes-count").textContent = `${total} recette${total > 1 ? "s" : ""}`;
 }
-
 
 export default renderRecipes;
