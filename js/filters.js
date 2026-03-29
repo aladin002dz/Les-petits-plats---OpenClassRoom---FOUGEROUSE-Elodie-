@@ -38,8 +38,9 @@ function filterRecipes(recipes, selectedItems, searchQuery) {
 // Filtre blanc : une ligne cliquable dans la liste déroulante
 function createOptionEl(label, selected, onSelect) {
   const li = document.createElement("li");
-  li.className =
-    "cursor-pointer px-4 py-2.5 font-manrope text-base font-medium leading-none text-dark transition-colors hover:bg-light-gray focus:bg-light-gray focus:outline-none";
+  li.className = selected
+    ? "cursor-pointer px-4 py-2.5 font-manrope text-base font-medium leading-none text-dark transition-colors bg-primary"
+    : "cursor-pointer px-4 py-2.5 font-manrope text-base font-medium leading-none text-dark transition-colors hover:bg-light-gray focus:bg-light-gray focus:outline-none";
   li.setAttribute("role", "option");
   li.setAttribute("aria-selected", selected ? "true" : "false");
   li.textContent = label;
@@ -81,34 +82,21 @@ function initRecipe(recipes) {
   // Tag jaune : conteneur DOM des tags
   const selectedListEl = document.getElementById("recipes-selected-list");
 
-  // Collecte toutes les valeurs brutes depuis les recettes
-  const allIngredients = [];
-  const allAppliances = [];
-  const allUstensils = [];
-  for (const recipe of recipes) {
-    for (const item of recipe.ingredients) allIngredients.push(item.ingredient);
-    allAppliances.push(recipe.appliance);
-    for (const name of recipe.ustensils) allUstensils.push(name);
-  }
-
-  // Filtre blanc : config des 3 boutons (Ingrédients, Appareils, Ustensiles) avec leurs options extraites des recettes
+  // Filtre blanc : config des 3 boutons (Ingrédients, Appareils, Ustensiles)
   const configs = [
     {
       type: "ingredient",
       label: "Ingrédients",
-      options: extractUnique(allIngredients),
       btnSelector: '[data-filter="ingredients"]',
     },
     {
       type: "appliance",
       label: "Appareils",
-      options: extractUnique(allAppliances),
       btnSelector: '[data-filter="appliances"]',
     },
     {
       type: "ustensil",
       label: "Ustensiles",
-      options: extractUnique(allUstensils),
       btnSelector: '[data-filter="ustensils"]',
     },
   ];
@@ -204,21 +192,52 @@ function initRecipe(recipes) {
     list.className = "m-0 list-none p-0 max-h-[220px] overflow-y-auto pb-2";
     dropdown.appendChild(list);
 
-    const normalizedOptions = config.options.map((opt) => ({ label: opt, normalized: normalize(opt) }));
-
     function resetSearch() {
       searchInput.value = "";
       clearBtn.classList.add("hidden");
     }
 
+    function getOptionsFromRecipes(filteredRecipes) {
+      const values = [];
+      if (config.type === "ingredient") {
+        for (const recipe of filteredRecipes)
+          for (const item of recipe.ingredients) values.push(item.ingredient);
+      } else if (config.type === "appliance") {
+        for (const recipe of filteredRecipes) values.push(recipe.appliance);
+      } else if (config.type === "ustensil") {
+        for (const recipe of filteredRecipes)
+          for (const name of recipe.ustensils) values.push(name);
+      }
+      return extractUnique(values);
+    }
+
     function renderOptionsFor() {
       list.innerHTML = "";
+
+      // Options dynamiques : basées sur les recettes actuellement filtrées
+      const currentFiltered = filterRecipes(recipes, selectedItems, searchQuery);
+      const dynamicOptions = getOptionsFromRecipes(currentFiltered);
       const q = normalize(searchInput.value);
-      const filtered = q ? normalizedOptions.filter((o) => o.normalized.includes(q)) : normalizedOptions;
-      for (const { label: opt } of filtered) {
-        const selected = isAlreadySelected(config.type, opt);
-        const li = createOptionEl(opt, selected, () => {
-          if (selected) return;
+      const visibleOptions = q ? dynamicOptions.filter((opt) => normalize(opt).includes(q)) : dynamicOptions;
+
+      // Afficher les items sélectionnés en jaune en haut
+      const selectedForType = selectedItems.filter((s) => s.type === config.type);
+      for (const item of selectedForType) {
+        const li = createOptionEl(item.value, true, () => {
+          const idx = selectedItems.findIndex(
+            (s) => s.type === item.type && normalize(s.value) === normalize(item.value)
+          );
+          if (idx !== -1) selectedItems.splice(idx, 1);
+          applyFilter();
+          renderOptionsFor();
+        });
+        list.appendChild(li);
+      }
+
+      // Afficher les options disponibles (non sélectionnées)
+      for (const opt of visibleOptions) {
+        if (isAlreadySelected(config.type, opt)) continue;
+        const li = createOptionEl(opt, false, () => {
           selectedItems.push({ type: config.type, value: opt });
           renderSelectedList();
           closeDropdown();
