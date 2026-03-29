@@ -89,13 +89,23 @@ function createRecipeCard(recipe) {
   return article;
 }
 
-// Affiche une liste de recettes dans le conteneur prévu (recipeList : tableau de recettes)
-function renderRecipes(recipeList) {
+// Affiche une liste de recettes dans le conteneur prévu (recipeList : tableau, query : chaîne de recherche)
+function renderRecipes(recipeList, query = "") {
   const grid = document.getElementById("recipes-grid");
   grid.innerHTML = "";
 
-  for (const recipe of recipeList) {
-    grid.appendChild(createRecipeCard(recipe));
+  if (recipeList.length === 0) {
+    const msg = document.createElement("p");
+    msg.className = "col-span-full font-manrope text-base text-dark text-center py-12";
+    const safeQuery = query.trim();
+    msg.textContent = safeQuery
+      ? `Aucune recette ne contient "${safeQuery}", vous pouvez chercher "tarte aux pommes", "poisson", etc.`
+      : "Aucune recette ne correspond à votre recherche.";
+    grid.appendChild(msg);
+  } else {
+    for (const recipe of recipeList) {
+      grid.appendChild(createRecipeCard(recipe));
+    }
   }
 
   const total = recipeList.length;

@@ -5,7 +5,11 @@ export function attachSearch({ onQueryChange }) {
   const form = document.getElementById("recipe-search-form");
 
   function emit() {
-    onQueryChange(input.value);
+    const value = input.value;
+    // La recherche se lance uniquement si le champ est vide ou contient au moins 3 caractères
+    if (value.length === 0 || value.length >= 3) {
+      onQueryChange(value);
+    }
   }
 
   input.addEventListener("input", emit);

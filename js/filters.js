@@ -105,7 +105,7 @@ function initRecipe(recipes) {
 
   function applyFilter() {
     const filtered = filterRecipes(recipes, selectedItems, searchQuery);
-    renderRecipes(filtered);
+    renderRecipes(filtered, searchQuery);
     renderSelectedList();
   }
 
