@@ -153,7 +153,7 @@ function initRecipe(recipes) {
     if (!btn) return;
 
     const wrapper = document.createElement("div");
-    wrapper.className = "relative flex flex-col items-start gap-2";
+    wrapper.className = "relative flex flex-col items-start gap-2 shrink-0";
     btn.parentNode.insertBefore(wrapper, btn);
     wrapper.appendChild(btn);
 
