@@ -9,20 +9,15 @@ export function supprimerPluriel(mot) {
   return mot;
 }
 
-function depluraliserMots(texte) {
-  return texte.split(/\s+/).map(supprimerPluriel).join(" ");
-}
-
-function construireChaineRecherchable(recette) {
-  const parties = [
-    recette.name,
-    recette.description,
-    ...recette.ingredients.map((i) => i.ingredient),
-  ];
-  return depluraliserMots(normaliserTexte(parties.join(" ")));
-}
-
 export function recetteCorrespondRecherche(recette, requeteNormalisee) {
   if (!requeteNormalisee) return true;
-  return construireChaineRecherchable(recette).includes(depluraliserMots(requeteNormalisee));
+
+  if (normaliserTexte(recette.name).includes(requeteNormalisee)) return true;
+  if (normaliserTexte(recette.description).includes(requeteNormalisee)) return true;
+
+  for (let i = 0; i < recette.ingredients.length; i++) {
+    if (normaliserTexte(recette.ingredients[i].ingredient).includes(requeteNormalisee)) return true;
+  }
+
+  return false;
 }
