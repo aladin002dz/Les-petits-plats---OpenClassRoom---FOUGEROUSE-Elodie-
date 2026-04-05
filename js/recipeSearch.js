@@ -9,16 +9,20 @@ export function supprimerPluriel(mot) {
   return mot;
 }
 
+function depluraliserMots(texte) {
+  return texte.split(/\s+/).map(supprimerPluriel).join(" ");
+}
+
 function construireChaineRecherchable(recette) {
   const parties = [
     recette.name,
     recette.description,
     ...recette.ingredients.map((i) => i.ingredient),
   ];
-  return normaliserTexte(parties.join(" "));
+  return depluraliserMots(normaliserTexte(parties.join(" ")));
 }
 
 export function recetteCorrespondRecherche(recette, requeteNormalisee) {
   if (!requeteNormalisee) return true;
-  return construireChaineRecherchable(recette).includes(requeteNormalisee);
+  return construireChaineRecherchable(recette).includes(depluraliserMots(requeteNormalisee));
 }
