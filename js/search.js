@@ -1,20 +1,18 @@
-// Barre de recherche du header : écoute le champ de saisie et transmet la valeur.
-
-export function attachSearch({ onQueryChange }) {
+export function attacherBarreRecherche({ onChangementRequete }) {
   const input = document.getElementById("recipe-search-input");
   const form = document.getElementById("recipe-search-form");
 
-  function emit() {
-    const value = input.value;
-    // La recherche se lance uniquement si le champ est vide ou contient au moins 3 caractères
-    if (value.length === 0 || value.length >= 3) {
-      onQueryChange(value);
+  function emettre() {
+    const valeur = input.value;
+    // Minimum 3 caractères requis (ou champ vide pour réinitialiser)
+    if (valeur.length === 0 || valeur.length >= 3) {
+      onChangementRequete(valeur);
     }
   }
 
-  input.addEventListener("input", emit);
+  input.addEventListener("input", emettre);
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    emit();
+    emettre();
   });
 }

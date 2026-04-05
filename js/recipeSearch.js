@@ -1,30 +1,24 @@
-// Logique de recherche et de normalisation sur les recettes (sans DOM).
-
-// Normalise une chaîne pour comparaison (minuscules, trim)
-export function normalize(s) {
-  return s.trim().toLowerCase();
+export function normaliserTexte(texte) {
+  return texte.trim().toLowerCase();
 }
 
-// Réduit un mot à sa racine en retirant le pluriel français (s/x final)
-export function stem(s) {
-  if (s.length > 3 && (s.endsWith("s") || s.endsWith("x"))) {
-    return s.slice(0, -1);
+export function supprimerPluriel(mot) {
+  if (mot.length > 3 && (mot.endsWith("s") || mot.endsWith("x"))) {
+    return mot.slice(0, -1);
   }
-  return s;
+  return mot;
 }
 
-// Construit le texte indexé d'une recette (nom, description, ingrédients)
-function recipeSearchText(recipe) {
-  const parts = [
-    recipe.name,
-    recipe.description,
-    ...recipe.ingredients.map((i) => i.ingredient),
+function construireChaineRecherchable(recette) {
+  const parties = [
+    recette.name,
+    recette.description,
+    ...recette.ingredients.map((i) => i.ingredient),
   ];
-  return normalize(parts.join(" "));
+  return normaliserTexte(parties.join(" "));
 }
 
-// Vérifie si une recette correspond à la requête de recherche
-export function recipeMatchesSearch(recipe, normalizedQuery) {
-  if (!normalizedQuery) return true;
-  return recipeSearchText(recipe).includes(normalizedQuery);
+export function recetteCorrespondRecherche(recette, requeteNormalisee) {
+  if (!requeteNormalisee) return true;
+  return construireChaineRecherchable(recette).includes(requeteNormalisee);
 }
