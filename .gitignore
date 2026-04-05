@@ -17,7 +17,11 @@ npm-debug.log*
 
 
 # Optionnel : décommenter si tu ne veux pas versionner le PDF
-*.pdf
+Cas+d’utilisation+#03+_+Filtrer+les+recettes+dans+l’interface+utilisateur+-+Front-end+P6+(Algorithms)+.pdf
+
+# Optionnel : docx
+*.docx
+
 
 #Config Claude
 .Claude
