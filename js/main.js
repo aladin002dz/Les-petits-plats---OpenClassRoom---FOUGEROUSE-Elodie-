@@ -164,7 +164,7 @@ async function chargerRecettes() {
  * Gère : ouverture/fermeture, recherche locale, effacement, sélection d'option.
  * @param {Object} config — entrée de CONFIGS_FILTRES décrivant le dropdown.
  */
-function configurerUnDropdown(config) {
+function gererUnDropdown(config) {
   const btn           = document.getElementById(config.btnId);
   const dropdown      = document.getElementById(config.dropdownId);
   const searchInput   = document.getElementById(config.searchId);
@@ -231,9 +231,9 @@ function configurerUnDropdown(config) {
 /**
  * Initialise les trois dropdowns de filtres en itérant sur CONFIGS_FILTRES.
  */
-function configurerDropdowns() {
+function gererDropdowns() {
   for (const config of CONFIGS_FILTRES) {
-    configurerUnDropdown(config);
+    gererUnDropdown(config);
   }
 }
 
@@ -241,7 +241,7 @@ function configurerDropdowns() {
  * Attache les écouteurs de la barre de recherche principale.
  * Déclenche le filtrage à partir de 3 caractères ou quand le champ est vidé.
  */
-function configurerBarreDeRecherche() {
+function gererBarreDeRecherche() {
   const champRecherche = document.getElementById("recipe-search-input");
   const formulaireRecherche = document.getElementById("recipe-search-form");
 
@@ -264,7 +264,7 @@ function configurerBarreDeRecherche() {
  * Délègue la suppression de tags sélectionnés via un unique listener
  * sur le conteneur `recipes-selected-list`.
  */
-function configurerSuppressionTags() {
+function gererSuppressionTags() {
   document.getElementById("recipes-selected-list").addEventListener("click", (e) => {
     const boutonRetirer = e.target.closest("[data-tag-retirer]");
     if (!boutonRetirer) return;
@@ -282,7 +282,7 @@ function configurerSuppressionTags() {
 /**
  * Ferme le dropdown ouvert lors d'un clic extérieur ou de la touche Échap.
  */
-function configurerFermetureGlobale() {
+function gererFermetureGlobale() {
   document.addEventListener("click", () => fermerMenuOuvert());
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") fermerMenuOuvert();
@@ -297,10 +297,10 @@ function configurerFermetureGlobale() {
  */
 async function initialiserApp() {
   etat.toutesRecettes = await chargerRecettes();
-  configurerDropdowns();
-  configurerBarreDeRecherche();
-  configurerSuppressionTags();
-  configurerFermetureGlobale();
+  gererDropdowns();
+  gererBarreDeRecherche();
+  gererSuppressionTags();
+  gererFermetureGlobale();
   filtrerEtAfficher();
 }
 
