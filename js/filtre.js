@@ -89,19 +89,23 @@ function recetteRespecteCritere(recette, critere) {
 // ── Filtrage principal ───────────────────────────────────────────────────────
 
 /**
- * Filtre les recettes selon la requête textuelle ET les critères de filtres.
+ * Filtre les recettes selon la requête textuelle ET les filtres actifs.
  * @param {Object[]} recettes — toutes les recettes
- * @param {{ type: string, value: string }[]} criteres — filtres actifs
+ * @param {{ ingredient: string[], appliance: string[], ustensil: string[] }} filtresActifs — filtres actifs par type
  * @param {string} requete — texte de la barre de recherche
  * @returns {Object[]} recettes correspondantes
  */
-export function filtrerRecettes(recettes, criteres, requete) {
+export function filtrerRecettes(recettes, filtresActifs, requete) {
   const q = normaliserTexte(requete);
-  return recettes.filter(
-    (recette) =>
-      recetteCorrespondRecherche(recette, q) &&
-      criteres.every((critere) => recetteRespecteCritere(recette, critere))
-  );
+  return recettes.filter((recette) => {
+    if (!recetteCorrespondRecherche(recette, q)) return false;
+    for (const [type, valeurs] of Object.entries(filtresActifs)) {
+      for (const valeur of valeurs) {
+        if (!recetteRespecteCritere(recette, { type, value: valeur })) return false;
+      }
+    }
+    return true;
+  });
 }
 
 // ── Extraction de valeurs uniques ────────────────────────────────────────────
@@ -148,14 +152,16 @@ export function extraireValeursParType(recettes, type) {
 // ── Vérification de sélection ────────────────────────────────────────────────
 
 /**
- * Vérifie si un critère (type + valeur) est déjà dans la liste des sélectionnés.
- * @param {{ type: string, value: string }[]} criteres
+ * Vérifie si une valeur est déjà sélectionnée pour un type de filtre donné.
+ * @param {{ ingredient: string[], appliance: string[], ustensil: string[] }} filtresActifs
  * @param {string} type
  * @param {string} valeur
  * @returns {boolean}
  */
-export function estDejaSelectionne(criteres, type, valeur) {
-  return criteres.some(
-    (c) => c.type === type && normaliserTexte(c.value) === normaliserTexte(valeur)
+export function estDejaSelectionne(filtresActifs, type, valeur) {
+  const valeurs = filtresActifs[type];
+  if (!valeurs) return false;
+  return valeurs.some(
+    (v) => normaliserTexte(v) === normaliserTexte(valeur)
   );
 }

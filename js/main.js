@@ -46,16 +46,20 @@ const CONFIGS_FILTRES = [
  * et garantit la cohérence entre les différents composants visuels.
  *
  * @type {{
- *   toutesRecettes:      Object[],    // Données brutes chargées une seule fois
- *   criteresSelectionnes: { type: string, value: string }[], // Filtres actifs
- *   requeteRecherche:    string,      // Texte courant de la barre de recherche
- *   dropdownOuvert:      HTMLElement|null, // Panneau dropdown actuellement ouvert
- *   dropdowns:           Object[],    // Métadonnées de chaque dropdown instancié
+ *   toutesRecettes:  Object[],    // Données brutes chargées une seule fois
+ *   filtresActifs:   { ingredient: string[], appliance: string[], ustensil: string[] }, // Filtres actifs par type
+ *   requeteRecherche: string,     // Texte courant de la barre de recherche
+ *   dropdownOuvert:  HTMLElement|null, // Panneau dropdown actuellement ouvert
+ *   dropdowns:       Object[],    // Métadonnées de chaque dropdown instancié
  * }}
  */
 const etat = {
   toutesRecettes: [],
-  criteresSelectionnes: [],
+  filtresActifs: {
+    ingredient: [],
+    appliance: [],
+    ustensil: [],
+  },
   requeteRecherche: "",
   dropdownOuvert: null,
   dropdowns: [],
@@ -66,25 +70,25 @@ const etat = {
 /**
  * Recalcule les recettes filtrées et met à jour l'ensemble de l'interface :
  * grille de recettes, compteur et tags sélectionnés.
- * À appeler après chaque modification de `etat.criteresSelectionnes`
+ * À appeler après chaque modification de `etat.filtresActifs`
  * ou `etat.requeteRecherche`.
  */
 function mettreAJour() {
   const filtrees = filtrerRecettes(
     etat.toutesRecettes,
-    etat.criteresSelectionnes,
+    etat.filtresActifs,
     etat.requeteRecherche
   );
   afficherRecettes(filtrees, etat.requeteRecherche);
   afficherTagsSelectionnes(
-    etat.criteresSelectionnes,
+    etat.filtresActifs,
     document.getElementById("recipes-selected-list")
   );
 }
 
 /**
  * Rafraîchit la liste d'options d'un dropdown spécifique en tenant compte
- * de la recherche locale (saisie dans ce dropdown) et des critères actifs.
+ * de la recherche locale (saisie dans ce dropdown) et des filtres actifs.
  * Les options déjà sélectionnées sont affichées en tête de liste ;
  * les autres sont filtrées selon la saisie dans la barre du dropdown.
  * @param {{ config: Object, searchInput: HTMLInputElement, liste: HTMLUListElement }} dd
@@ -95,7 +99,7 @@ function rafraichirOptions(dd) {
   // que les options cohérentes avec les autres filtres actifs
   const filtrees = filtrerRecettes(
     etat.toutesRecettes,
-    etat.criteresSelectionnes,
+    etat.filtresActifs,
     etat.requeteRecherche
   );
   const toutesOptions = extraireValeursParType(filtrees, dd.config.type);
@@ -106,12 +110,10 @@ function rafraichirOptions(dd) {
     ? toutesOptions.filter((o) => normaliserTexte(o).includes(rechercheLocale))
     : toutesOptions;
 
-  // Sépare les options sélectionnées des options disponibles pour ce type
-  const selectionnesParType = etat.criteresSelectionnes.filter(
-    (c) => c.type === dd.config.type
-  );
+  // Accès direct au tableau des valeurs sélectionnées pour ce type
+  const selectionnesParType = etat.filtresActifs[dd.config.type] || [];
   const disponibles = optionsFiltrees.filter(
-    (opt) => !estDejaSelectionne(etat.criteresSelectionnes, dd.config.type, opt)
+    (opt) => !estDejaSelectionne(etat.filtresActifs, dd.config.type, opt)
   );
 
   remplirListeOptions(dd.liste, selectionnesParType, disponibles);
@@ -214,16 +216,13 @@ async function initialiserApp() {
       const dejaSelectionne = li.dataset.optionSelectionne === "true";
 
       if (dejaSelectionne) {
-        // Désélection : retire le critère de la liste
-        const idx = etat.criteresSelectionnes.findIndex(
-          (c) =>
-            c.type === config.type &&
-            normaliserTexte(c.value) === normaliserTexte(valeur)
+        // Désélection : retire la valeur du tableau correspondant
+        etat.filtresActifs[config.type] = etat.filtresActifs[config.type].filter(
+          (v) => normaliserTexte(v) !== normaliserTexte(valeur)
         );
-        if (idx !== -1) etat.criteresSelectionnes.splice(idx, 1);
       } else {
-        // Sélection : ajoute le critère et ferme le dropdown
-        etat.criteresSelectionnes.push({ type: config.type, value: valeur });
+        // Sélection : ajoute la valeur et ferme le dropdown
+        etat.filtresActifs[config.type].push(valeur);
         fermerMenuOuvert();
       }
 
@@ -261,10 +260,12 @@ async function initialiserApp() {
     if (!boutonRetirer) return;
 
     const valeur = boutonRetirer.dataset.tagRetirer;
-    const idx = etat.criteresSelectionnes.findIndex(
-      (c) => normaliserTexte(c.value) === normaliserTexte(valeur)
+    const type = boutonRetirer.dataset.tagType;
+
+    // Retire la valeur du tableau correspondant au type de filtre
+    etat.filtresActifs[type] = etat.filtresActifs[type].filter(
+      (v) => normaliserTexte(v) !== normaliserTexte(valeur)
     );
-    if (idx !== -1) etat.criteresSelectionnes.splice(idx, 1);
     mettreAJour();
   });
 

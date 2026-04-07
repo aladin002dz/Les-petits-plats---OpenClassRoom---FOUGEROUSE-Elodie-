@@ -169,14 +169,14 @@ function creerElementOption(label, selectionne) {
  * Remplit la liste <ul> d'un dropdown avec les options sélectionnées (en haut)
  * puis les options disponibles (en dessous).
  * @param {HTMLElement} liste — élément <ul> du dropdown
- * @param {{ value: string }[]} selectionnes — critères actifs pour ce type
+ * @param {string[]} selectionnes — valeurs actives pour ce type
  * @param {string[]} disponibles — options non encore sélectionnées
  */
 export function remplirListeOptions(liste, selectionnes, disponibles) {
   liste.innerHTML = "";
 
-  for (const critere of selectionnes) {
-    liste.appendChild(creerElementOption(critere.value, true));
+  for (const valeur of selectionnes) {
+    liste.appendChild(creerElementOption(valeur, true));
   }
 
   for (const option of disponibles) {
@@ -188,11 +188,13 @@ export function remplirListeOptions(liste, selectionnes, disponibles) {
 
 /**
  * Crée un tag visuel pour un critère sélectionné.
- * Le bouton ✕ porte un attribut data-tag-retirer pour la délégation d'événement.
+ * Le bouton ✕ porte les attributs data-tag-retirer (valeur) et data-tag-type
+ * pour que la délégation d'événement sache quel tableau cibler.
+ * @param {string} type — type de filtre (ingredient, appliance, ustensil)
  * @param {string} label — valeur du critère
  * @returns {HTMLElement}
  */
-function creerTagSelectionne(label) {
+function creerTagSelectionne(type, label) {
   const tag = document.createElement("span");
   tag.className =
     "inline-flex h-[53px] w-[203px] items-center justify-between gap-2 rounded-ui bg-primary px-[18px] py-[17px] font-manrope text-sm font-normal leading-none tracking-normal text-dark opacity-100";
@@ -205,20 +207,23 @@ function creerTagSelectionne(label) {
     ` <button type="button"` +
     ` class="inline-flex h-[20px] w-[20px] shrink-0 items-center justify-center border-0 bg-transparent p-0 cursor-pointer text-dark opacity-100 m-0 hover:opacity-90"` +
     ` aria-label="Retirer ${echapperHtml(label)}"` +
-    ` data-tag-retirer="${echapperHtml(label)}">${crossSvg}</button>`;
+    ` data-tag-retirer="${echapperHtml(label)}"` +
+    ` data-tag-type="${type}">${crossSvg}</button>`;
 
   return tag;
 }
 
 /**
- * Affiche tous les tags des critères sélectionnés dans le conteneur.
- * @param {{ type: string, value: string }[]} criteres
+ * Affiche tous les tags des filtres actifs dans le conteneur.
+ * @param {{ ingredient: string[], appliance: string[], ustensil: string[] }} filtresActifs
  * @param {HTMLElement} conteneur — élément #recipes-selected-list
  */
-export function afficherTagsSelectionnes(criteres, conteneur) {
+export function afficherTagsSelectionnes(filtresActifs, conteneur) {
   conteneur.innerHTML = "";
-  for (const critere of criteres) {
-    conteneur.appendChild(creerTagSelectionne(critere.value));
+  for (const [type, valeurs] of Object.entries(filtresActifs)) {
+    for (const valeur of valeurs) {
+      conteneur.appendChild(creerTagSelectionne(type, valeur));
+    }
   }
 }
 
