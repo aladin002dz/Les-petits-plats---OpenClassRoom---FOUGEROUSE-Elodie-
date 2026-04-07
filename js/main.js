@@ -73,7 +73,7 @@ const etat = {
  * À appeler après chaque modification de `etat.filtresActifs`
  * ou `etat.requeteRecherche`.
  */
-function mettreAJour() {
+function filtrerEtAfficher() {
   const filtrees = filtrerRecettes(
     etat.toutesRecettes,
     etat.filtresActifs,
@@ -148,113 +148,123 @@ function ouvrirMenu(dd) {
   dd.searchInput.focus();
 }
 
-// ── Initialisation ───────────────────────────────────────────────────────────
+// ── Initialisation — fonctions spécialisées ──────────────────────────────────
 
 /**
- * Point d'entrée principal de l'application.
- * Charge les données JSON, construit les dropdowns dynamiquement puis
- * attache tous les écouteurs d'événements nécessaires au fonctionnement
- * de la recherche et des filtres.
+ * Charge les données JSON et les stocke dans l'état global.
+ * Ne doit être appelée qu'une seule fois, au démarrage de l'application.
  */
-async function initialiserApp() {
-  // Chargement unique des données — la liste brute ne change jamais après ça
+async function chargerRecettes() {
   const reponse = await fetch("./data/recipes.json");
-  etat.toutesRecettes = await reponse.json();
+  return reponse.json();
+}
 
-  // ── Liaison des dropdowns (structure déjà présente dans le HTML) ────────
-  // Les éléments sont interrogés par id — aucune création dynamique de DOM.
+/**
+ * Attache les écouteurs d'événements pour un dropdown de filtre donné.
+ * Gère : ouverture/fermeture, recherche locale, effacement, sélection d'option.
+ * @param {Object} config — entrée de CONFIGS_FILTRES décrivant le dropdown.
+ */
+function configurerUnDropdown(config) {
+  const btn           = document.getElementById(config.btnId);
+  const dropdown      = document.getElementById(config.dropdownId);
+  const searchInput   = document.getElementById(config.searchId);
+  const boutonEffacer = document.getElementById(config.clearId);
+  const liste         = document.getElementById(config.listId);
 
+  if (!btn || !dropdown || !searchInput || !boutonEffacer || !liste) return;
+
+  const dd = { config, btn, dropdown, liste, searchInput, boutonEffacer };
+  etat.dropdowns.push(dd);
+
+  // Bascule ouverture/fermeture du dropdown
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (dropdown.classList.contains("block")) {
+      fermerMenuOuvert();
+    } else {
+      ouvrirMenu(dd);
+    }
+  });
+
+  // Filtrage en temps réel des options selon la saisie
+  searchInput.addEventListener("input", (e) => {
+    e.stopPropagation();
+    boutonEffacer.classList.toggle("hidden", searchInput.value === "");
+    rafraichirOptions(dd);
+  });
+
+  // Empêche le clic sur l'input de fermer le dropdown
+  searchInput.addEventListener("click", (e) => e.stopPropagation());
+
+  // Réinitialise la recherche interne du dropdown
+  boutonEffacer.addEventListener("click", (e) => {
+    e.stopPropagation();
+    searchInput.value = "";
+    boutonEffacer.classList.add("hidden");
+    rafraichirOptions(dd);
+    searchInput.focus();
+  });
+
+  // Délégation d'événement : sélection / désélection d'une option
+  liste.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const li = e.target.closest("[data-option-valeur]");
+    if (!li) return;
+
+    const valeur = li.dataset.optionValeur;
+    const dejaSelectionne = li.dataset.optionSelectionne === "true";
+
+    if (dejaSelectionne) {
+      etat.filtresActifs[config.type] = etat.filtresActifs[config.type].filter(
+        (v) => normaliserTexte(v) !== normaliserTexte(valeur)
+      );
+    } else {
+      etat.filtresActifs[config.type].push(valeur);
+      fermerMenuOuvert();
+    }
+
+    filtrerEtAfficher();
+    rafraichirOptions(dd);
+  });
+}
+
+/**
+ * Initialise les trois dropdowns de filtres en itérant sur CONFIGS_FILTRES.
+ */
+function configurerDropdowns() {
   for (const config of CONFIGS_FILTRES) {
-    const btn         = document.getElementById(config.btnId);
-    const dropdown    = document.getElementById(config.dropdownId);
-    const searchInput = document.getElementById(config.searchId);
-    const boutonEffacer = document.getElementById(config.clearId);
-    const liste       = document.getElementById(config.listId);
-
-    if (!btn || !dropdown || !searchInput || !boutonEffacer || !liste) continue;
-
-    // Regroupement des références utiles pour ce dropdown
-    const dd = { config, btn, dropdown, liste, searchInput, boutonEffacer };
-    etat.dropdowns.push(dd);
-
-    // Bouton du filtre : bascule ouverture/fermeture
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation(); // Empêche la fermeture globale via le clic sur document
-      if (dropdown.classList.contains("block")) {
-        fermerMenuOuvert();
-      } else {
-        ouvrirMenu(dd);
-      }
-    });
-
-    // Filtrage en temps réel des options selon la saisie dans le dropdown
-    searchInput.addEventListener("input", (e) => {
-      e.stopPropagation();
-      boutonEffacer.classList.toggle("hidden", searchInput.value === "");
-      rafraichirOptions(dd);
-    });
-
-    // Empêche le clic sur l'input de fermer le dropdown via la bulle d'événement
-    searchInput.addEventListener("click", (e) => e.stopPropagation());
-
-    // Réinitialise la recherche interne et remet le focus sur l'input
-    boutonEffacer.addEventListener("click", (e) => {
-      e.stopPropagation();
-      searchInput.value = "";
-      boutonEffacer.classList.add("hidden");
-      rafraichirOptions(dd);
-      searchInput.focus();
-    });
-
-    // Délégation d'événement : un seul listener pour toutes les options `<li>`
-    liste.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const li = e.target.closest("[data-option-valeur]");
-      if (!li) return; // Clic en dehors d'une option valide
-
-      const valeur = li.dataset.optionValeur;
-      const dejaSelectionne = li.dataset.optionSelectionne === "true";
-
-      if (dejaSelectionne) {
-        // Désélection : retire la valeur du tableau correspondant
-        etat.filtresActifs[config.type] = etat.filtresActifs[config.type].filter(
-          (v) => normaliserTexte(v) !== normaliserTexte(valeur)
-        );
-      } else {
-        // Sélection : ajoute la valeur et ferme le dropdown
-        etat.filtresActifs[config.type].push(valeur);
-        fermerMenuOuvert();
-      }
-
-      mettreAJour();
-      rafraichirOptions(dd); // Rafraîchit les options pour refléter la nouvelle sélection
-    });
+    configurerUnDropdown(config);
   }
+}
 
-  // ── Barre de recherche principale ────────────────────────────────────────
-
+/**
+ * Attache les écouteurs de la barre de recherche principale.
+ * Déclenche le filtrage à partir de 3 caractères ou quand le champ est vidé.
+ */
+function configurerBarreDeRecherche() {
   const champRecherche = document.getElementById("recipe-search-input");
   const formulaireRecherche = document.getElementById("recipe-search-form");
 
-  // Déclenche la recherche à partir de 3 caractères ou lors d'une réinitialisation
   champRecherche.addEventListener("input", () => {
     const valeur = champRecherche.value;
     if (valeur.length === 0 || valeur.length >= 3) {
       etat.requeteRecherche = valeur;
-      mettreAJour();
+      filtrerEtAfficher();
     }
   });
 
-  // Soumission du formulaire (touche Entrée) : force la mise à jour immédiate
   formulaireRecherche.addEventListener("submit", (e) => {
     e.preventDefault();
     etat.requeteRecherche = champRecherche.value;
-    mettreAJour();
+    filtrerEtAfficher();
   });
+}
 
-  // ── Suppression de tags ───────────────────────────────────────────────────
-
-  // Délégation d'événement : un seul listener pour tous les boutons de retrait de tag
+/**
+ * Délègue la suppression de tags sélectionnés via un unique listener
+ * sur le conteneur `recipes-selected-list`.
+ */
+function configurerSuppressionTags() {
   document.getElementById("recipes-selected-list").addEventListener("click", (e) => {
     const boutonRetirer = e.target.closest("[data-tag-retirer]");
     if (!boutonRetirer) return;
@@ -262,27 +272,36 @@ async function initialiserApp() {
     const valeur = boutonRetirer.dataset.tagRetirer;
     const type = boutonRetirer.dataset.tagType;
 
-    // Retire la valeur du tableau correspondant au type de filtre
     etat.filtresActifs[type] = etat.filtresActifs[type].filter(
       (v) => normaliserTexte(v) !== normaliserTexte(valeur)
     );
-    mettreAJour();
+    filtrerEtAfficher();
   });
+}
 
-  // ── Fermeture globale ─────────────────────────────────────────────────────
-
-  // Ferme le dropdown ouvert lorsque l'utilisateur clique en dehors
+/**
+ * Ferme le dropdown ouvert lors d'un clic extérieur ou de la touche Échap.
+ */
+function configurerFermetureGlobale() {
   document.addEventListener("click", () => fermerMenuOuvert());
-
-  // Ferme le dropdown ouvert via la touche Échap (accessibilité clavier)
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") fermerMenuOuvert();
   });
+}
 
-  // ── Rendu initial ─────────────────────────────────────────────────────────
+// ── Point d'entrée ───────────────────────────────────────────────────────────
 
-  // Affiche toutes les recettes sans filtre au chargement de la page
-  mettreAJour();
+/**
+ * Orchestre le démarrage de l'application.
+ * Chaque étape est déléguée à une fonction dédiée et nommée explicitement.
+ */
+async function initialiserApp() {
+  etat.toutesRecettes = await chargerRecettes();
+  configurerDropdowns();
+  configurerBarreDeRecherche();
+  configurerSuppressionTags();
+  configurerFermetureGlobale();
+  filtrerEtAfficher();
 }
 
 initialiserApp();
